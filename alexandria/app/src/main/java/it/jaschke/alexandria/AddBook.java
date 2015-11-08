@@ -1,6 +1,8 @@
 package it.jaschke.alexandria;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,6 +12,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,8 +39,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     private String mScanFormat = "Format:";
     private String mScanContents = "Contents:";
-
-
 
     public AddBook(){
     }
@@ -70,41 +71,30 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             @Override
             public void afterTextChanged(Editable s) {
                 String ean =s.toString();
-                //catch isbn10 numbers
-                if(ean.length()==10 && !ean.startsWith("978")){
-                    ean="978"+ean;
-                }
-                if(ean.length()<13){
-                    clearFields();
-                    return;
-                }
-                //Once we have an ISBN, start a book intent
-                Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
-                bookIntent.setAction(BookService.FETCH_BOOK);
-                getActivity().startService(bookIntent);
-                AddBook.this.restartLoader();
+                fetchBook(ean);
             }
         });
 
-        rootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // This is the callback method that the system will invoke when your button is
-                // clicked. You might do this by launching another app or by including the
-                //functionality directly in this app.
-                // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
-                // are using an external app.
-                //when you're done, remove the toast below.
-                Context context = getActivity();
-                CharSequence text = "This button should let you scan a book for its barcode!";
-                int duration = Toast.LENGTH_SHORT;
+        rootView.findViewById(R.id.scan_button).setOnClickListener(scanListener);
 
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-
-            }
-        });
+//                new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // This is the callback method that the system will invoke when your button is
+//                // clicked. You might do this by launching another app or by including the
+//                //functionality directly in this app.
+//                // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
+//                // are using an external app.
+//                //when you're done, remove the toast below.
+//                Context context = getActivity();
+//                CharSequence text = "This button should let you scan a book for its barcode!";
+//                int duration = Toast.LENGTH_SHORT;
+//
+//                Toast toast = Toast.makeText(context, text, duration);
+//                toast.show();
+//
+//            }
+//        });
 
         rootView.findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,6 +120,51 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
 
         return rootView;
+    }
+    private static final String SCAN = "com.google.zxing.client.android.SCAN";
+
+    private View.OnClickListener scanListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            try {
+                Intent intent = new Intent(SCAN);
+                intent.putExtra("SCAN_MODE", "BAR_CODE_MODE");
+                startActivityForResult(intent, 0);
+            } catch (ActivityNotFoundException e) {
+                Log.e("mytag", "exception");
+                e.printStackTrace();
+            }
+        }
+    };
+
+    private void fetchBook(String ean){
+        //catch isbn10 numbers
+        if(ean.length()==10 && !ean.startsWith("978")){
+            ean="978"+ean;
+        }
+        if(ean.length()<13){
+            clearFields();
+            return;
+        }
+        //Once we have an ISBN, start a book intent
+        Intent bookIntent = new Intent(getActivity(), BookService.class);
+        bookIntent.putExtra(BookService.EAN, ean);
+        bookIntent.setAction(BookService.FETCH_BOOK);
+        getActivity().startService(bookIntent);
+        AddBook.this.restartLoader();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e("mytag:requestCode", " " + requestCode);
+        Log.e("mytag:resultCode", " " + resultCode);
+        if (resultCode != 0 && null != data.getStringExtra("SCAN_RESULT")) {
+
+            fetchBook(data.getStringExtra("SCAN_RESULT"));
+            Log.e("mytag:data", " " + data.toString());
+            Log.e("mytag:dataSCAN_RESULT", " " + data.getStringExtra("SCAN_RESULT"));
+        }
     }
 
     private void restartLoader(){

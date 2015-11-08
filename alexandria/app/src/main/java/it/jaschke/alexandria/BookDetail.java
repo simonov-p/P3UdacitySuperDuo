@@ -93,6 +93,8 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
             return;
         }
 
+        Log.e("mytag:data", data.toString());
+
         bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
         ((TextView) rootView.findViewById(R.id.fullBookTitle)).setText(bookTitle);
 
@@ -110,10 +112,17 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
 
         String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
         String[] authorsArr = new String[]{"no author"};
+
         if (null != authors) {
             authorsArr = authors.split(",");
+
+        } else {
+            authors = "no authors";
+            authorsArr = authors.split(",");
         }
+
         ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
+
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){

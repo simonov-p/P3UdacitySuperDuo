@@ -202,6 +202,8 @@ public class BookService extends IntentService {
     }
 
     private void writeBackBook(String ean, String title, String subtitle, String desc, String imgUrl) {
+        Log.e("mytag:book", "ean="  + ean + ", title="  + title + ", imgUrl="  + imgUrl + ", subtitle="
+                + subtitle + ", desc="  + desc);
         ContentValues values= new ContentValues();
         values.put(AlexandriaContract.BookEntry._ID, ean);
         values.put(AlexandriaContract.BookEntry.TITLE, title);
