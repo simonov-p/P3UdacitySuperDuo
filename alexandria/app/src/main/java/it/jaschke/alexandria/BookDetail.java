@@ -93,8 +93,6 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
             return;
         }
 
-        Log.e("mytag:data", data.toString());
-
         bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
         ((TextView) rootView.findViewById(R.id.fullBookTitle)).setText(bookTitle);
 
@@ -117,7 +115,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
             authorsArr = authors.split(",");
 
         } else {
-            authors = "no authors";
+            authors = getString(R.string.no_authors);
             authorsArr = authors.split(",");
         }
 

@@ -8,6 +8,15 @@
         android:layout_height="fill_parent"
         android:layout_gravity="center_horizontal|top">
 
+        <TextView
+            android:id="@+id/no_book_result"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:layout_below="@+id/eancontainer"
+            android:text="@string/no_book_result"
+            android:visibility="gone"/>
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="wrap_content"
