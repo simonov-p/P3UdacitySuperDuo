@@ -20,11 +20,12 @@
             tools:src="@drawable/ic_launcher" />
 
         <TextView
-            android:id="@+id/widget_high_temperature"
+            android:id="@+id/score_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:fontFamily="sans-serif"
+            android:textSize="6sp"
             android:textAppearance="?android:textAppearanceLarge"
             tools:text="48" />
     </LinearLayout>

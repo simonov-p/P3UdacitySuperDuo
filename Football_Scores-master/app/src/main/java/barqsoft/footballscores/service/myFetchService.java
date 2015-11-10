@@ -35,6 +35,8 @@ public class myFetchService extends IntentService
     {
         super("myFetchService");
     }
+    public static final String ACTION_DATA_UPDATED = "barqsoft.footballscores.app.ACTION_DATA_UPDATED";
+
 
     @Override
     protected void onHandleIntent(Intent intent)
