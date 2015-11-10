@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.RemoteViews;
+
+import barqsoft.footballscores.R;
 
 
 /**
@@ -16,6 +19,14 @@ public class ScoreWidgetProvider extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.e("mytag:ScoreWidgetProvider", "onUpdate");
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_score);
+        views.setImageViewResource(R.id.widget_icon, R.drawable.ic_launcher);
+        views.setTextViewText(R.id.widget_high_temperature, "petr");
+
+
+        appWidgetManager.updateAppWidget(appWidgetIds[0], views);
+
+
 
 //        context.startService(new Intent(context, ScoreWidgetIntentService.class));
     }
