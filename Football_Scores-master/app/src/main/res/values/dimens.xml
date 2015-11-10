@@ -16,4 +16,5 @@
     <dimen name="widget_score_min_resize_height">@dimen/widget_score_default_height</dimen>
 
     <dimen name="widget_score_large_width">220dp</dimen>
+    <dimen name="widget_text_size">14sp</dimen>
 </resources>

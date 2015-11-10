@@ -62,18 +62,10 @@ public class ScoreWidgetIntentService extends IntentService {
         Cursor data = getContentResolver().query(gameUri, SCORES_COLUMNS, null,
                 null, null);
 
-
-
-        Log.e("mytag:", "here");
-
         if (data == null) {
-            Log.e("mytag:data", "null");
-
             return;
         }
         if (!data.moveToFirst()) {
-            Log.e("mytag:data", "moveToFirst");
-
             data.close();
             return;
         }
@@ -84,9 +76,6 @@ public class ScoreWidgetIntentService extends IntentService {
         int homeGoals = data.getInt(INDEX_HOME_GOALS);
         int awayGoals = data.getInt(INDEX_AWAY_GOALS);
         data.close();
-        Log.e("mytag:data", data.toString());
-        Log.e("mytag:data", homeCol + awayCol +  homeGoals + awayGoals);
-
 
         // Perform this loop procedure for each Today widget
         for (int appWidgetId : appWidgetIds) {
@@ -97,8 +86,11 @@ public class ScoreWidgetIntentService extends IntentService {
             int layoutId;
             if (widgetWidth >= largeWidth) {
                 layoutId = R.layout.widget_score_large;
-            } else {
+            } else if (widgetWidth >= defaultWidth) {
                 layoutId = R.layout.widget_score;
+            }
+            else {
+                layoutId = R.layout.widget_score_small;
             }
 
             RemoteViews views = new RemoteViews(getPackageName(), layoutId);
@@ -110,7 +102,6 @@ public class ScoreWidgetIntentService extends IntentService {
             views.setTextViewText(R.id.score_away_goal_text_view, awayGoals + "");
             views.setImageViewResource(R.id.home_icon, R.drawable.manchester_city);
             views.setImageViewResource(R.id.away_icon, R.drawable.arsenal);
-
 
             // Create an Intent to launch MainActivity
             Intent launchIntent = new Intent(this, MainActivity.class);

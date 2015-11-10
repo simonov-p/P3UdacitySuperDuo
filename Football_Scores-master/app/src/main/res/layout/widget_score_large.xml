@@ -18,24 +18,34 @@
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
             tools:src="@drawable/ic_launcher" />
-        <TextView
-            android:id="@+id/score_home_text_view"
-            android:layout_width="wrap_content"
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:fontFamily="sans-serif"
-            android:textSize="6sp"
-            android:textAppearance="?android:textAppearanceLarge"
-            tools:text="48" />
-        <TextView
-            android:id="@+id/score_home_goal_text_view"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:fontFamily="sans-serif"
-            android:textSize="6sp"
-            android:textAppearance="?android:textAppearanceLarge"
-            tools:text="48" />
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/score_home_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="sans-serif"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textSize="@dimen/widget_text_size"/>
+
+            <TextView
+                android:id="@+id/score_home_goal_text_view"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="sans-serif"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textSize="@dimen/widget_text_size" />
+        </LinearLayout>
+
         <ImageView
             android:id="@+id/widget_icon"
             android:layout_width="0dp"
@@ -44,25 +54,33 @@
             android:layout_weight="1"
             tools:src="@drawable/ic_launcher" />
 
-        <TextView
-            android:id="@+id/score_away_goal_text_view"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:fontFamily="sans-serif"
-            android:textSize="6sp"
-            android:textAppearance="?android:textAppearanceLarge"
-            tools:text="48" />
+            android:orientation="vertical"
+            android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/score_away_text_view"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:fontFamily="sans-serif"
-            android:textSize="6sp"
-            android:textAppearance="?android:textAppearanceLarge"
-            tools:text="48" />
+            <TextView
+                android:id="@+id/score_away_text_view"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="sans-serif"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textSize="@dimen/widget_text_size"/>
+            <TextView
+                android:id="@+id/score_away_goal_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="sans-serif"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textSize="@dimen/widget_text_size" />
+        </LinearLayout>
+
+
         <ImageView
             android:id="@+id/away_icon"
             android:layout_width="0dp"
