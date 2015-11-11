@@ -32,7 +32,10 @@
                 android:value=".MainActivity" />
         </activity>
 
-
+        <activity
+            android:name=".ScannerActivity"
+            android:label="@string/title_activity_scanner" >
+        </activity>
 
         <provider
             android:name=".data.BookProvider"

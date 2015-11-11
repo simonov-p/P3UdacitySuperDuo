@@ -41,6 +41,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private String mScanFormat = "Format:";
     private String mScanContents = "Contents:";
 
+    public static final int SCANNER = 0x0001;
+
     public AddBook() {
     }
 
@@ -76,7 +78,13 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             }
         });
 
-        rootView.findViewById(R.id.scan_button).setOnClickListener(scanListener);
+        rootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cameraIntent = new Intent(getActivity(), ScannerActivity.class);
+                startActivityForResult(cameraIntent, SCANNER);
+            }
+        });
 
         rootView.findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,19 +116,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     private final String SCAN_MODE = "SCAN_MODE";
     private final String BAR_CODE_MODE = "BAR_CODE_MODE";
-    private View.OnClickListener scanListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            try {
-                Intent intent = new Intent(SCAN);
-                intent.putExtra(SCAN_MODE, BAR_CODE_MODE);
-                startActivityForResult(intent, 0);
-            } catch (ActivityNotFoundException e) {
-                Log.e("mytag", "exception");
-                e.printStackTrace();
-            }
-        }
-    };
+
 
     private void fetchBook(String ean) {
         //catch isbn10 numbers
@@ -142,8 +138,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != 0 && null != data.getStringExtra(SCAN_RESULT)) {
-            mEanEditText.setText(data.getStringExtra(SCAN_RESULT));
+        if (resultCode == SCANNER && null != data) {
+            mEanEditText.setText(data.getStringExtra("ean_code"));
         }
     }
 

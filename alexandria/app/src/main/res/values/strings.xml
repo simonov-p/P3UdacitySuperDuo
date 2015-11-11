@@ -39,4 +39,5 @@
     <string name="pref_key">"pref_startFragment"</string>
     <string name="pref_defValue">"0"</string>
     <string name="book_detail">"Book Detail"</string>
+    <string name="title_activity_scanner">Scanner</string>
 </resources>
