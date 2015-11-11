@@ -38,4 +38,11 @@
     <string name="title_widget_score">Football Last Game</string>
     <string name="title_widget_today">Football Today</string>
     <string name="empty_today_list">No games today</string>
+    <string name="home_name_cd">Home team name</string>
+    <string name="away_name_cd">Away team name</string>
+    <string name="date_cd">Date of game</string>
+    <string name="score_cd">Score of the game</string>
+    <string name="home_crest_cd">Home team logo</string>
+    <string name="away_crest_cd">Away team logo</string>
+    <string name="share_button_cd">Share button</string>
 </resources>
