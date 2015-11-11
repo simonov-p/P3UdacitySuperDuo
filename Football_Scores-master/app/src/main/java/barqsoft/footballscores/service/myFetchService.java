@@ -4,7 +4,9 @@ import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -31,11 +33,16 @@ import barqsoft.footballscores.R;
 public class MyFetchService extends IntentService
 {
     public static final String LOG_TAG = MyFetchService.class.getSimpleName();
+
     public MyFetchService()
     {
         super("MyFetchService");
     }
     public static final String ACTION_DATA_UPDATED = "barqsoft.footballscores.app.ACTION_DATA_UPDATED";
+
+    private static final String SERVER_ERROR = "Server error";
+    private static final String SERVER_DOWN = "Server down";
+    private static final String SERVER_INVALID = "Server invalid";
 
     @Override
     protected void onHandleIntent(Intent intent)
@@ -89,7 +96,6 @@ public class MyFetchService extends IntentService
                 return;
             }
             JSON_data = buffer.toString();
-            Log.v("mytag:JSON_data", JSON_data);
             if (JSON_data != null) {
                 //This bit is to check if the data contains any matches. If not, we call processJson on the dummy data
                 JSONArray matches = new JSONObject(JSON_data).getJSONArray("fixtures");
@@ -103,15 +109,17 @@ public class MyFetchService extends IntentService
             } else {
                 //Could not Connect
                 Log.d(LOG_TAG, "Could not connect to server.");
+                setServerStatus(SERVER_DOWN);
             }
         }
         catch (IOException e) {
             e.printStackTrace();
-            Log.e(LOG_TAG,"Exception here" + e.getMessage());
+            Log.e(LOG_TAG, "Exception here" + e.getMessage());
+            setServerStatus(SERVER_DOWN);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
-//            setServerStatus(getApplicationContext(), "");
+            setServerStatus(SERVER_INVALID);
 
         } finally {
             if(m_connection != null)
@@ -163,6 +171,8 @@ public class MyFetchService extends IntentService
         final String AWAY_GOALS = "goalsAwayTeam";
         final String MATCH_DAY = "matchday";
 
+        final String OWM_MESSAGE_CODE = "cod";
+
         //Match data
         String League = null;
         String mDate = null;
@@ -176,7 +186,24 @@ public class MyFetchService extends IntentService
 
 
         try {
-            JSONArray matches = new JSONObject(JSONdata).getJSONArray(FIXTURES);
+            JSONObject jsonObject = new JSONObject(JSONdata);
+            JSONArray matches = jsonObject.getJSONArray(FIXTURES);
+
+            //do we have error?
+            if (jsonObject.has(OWM_MESSAGE_CODE)){
+                int errorCode = jsonObject.getInt(OWM_MESSAGE_CODE);
+
+                switch (errorCode){
+                    case HttpURLConnection.HTTP_OK:
+                        break;
+                    case HttpURLConnection.HTTP_NOT_FOUND:
+                        setServerStatus(SERVER_INVALID);
+                        return;
+                    default:
+                        setServerStatus(SERVER_DOWN);
+                        return;
+                }
+            }
 
 
             //ContentValues to be inserted
@@ -271,7 +298,17 @@ public class MyFetchService extends IntentService
         {
             e.printStackTrace();
             Log.e(LOG_TAG,e.getMessage());
+            setServerStatus(SERVER_INVALID);
+
         }
+    }
+
+    private void setServerStatus(String fetchStatus){
+        Context c = getApplicationContext();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putString(c.getString(R.string.pref_fetch_status_key), fetchStatus);
+        spe.commit();
     }
 }
 

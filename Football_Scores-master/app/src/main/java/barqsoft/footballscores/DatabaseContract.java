@@ -22,14 +22,10 @@ public class DatabaseContract {
         public static final String MATCH_ID = "match_id";
         public static final String MATCH_DAY = "match_day";
 
+        // paths
         public static final String ID_URI = "id";
         public static final String LEAGUE_URI = "league";
         public static final String DATE_URI = "date";
-
-
-
-        //public static Uri SCORES_CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH)
-        //.build();
 
         //Types
         public static final String CONTENT_TYPE =

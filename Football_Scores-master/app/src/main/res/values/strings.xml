@@ -45,4 +45,8 @@
     <string name="home_crest_cd">Home team logo</string>
     <string name="away_crest_cd">Away team logo</string>
     <string name="share_button_cd">Share button</string>
+
+    <string name="no_games">No games</string>
+    <string name="pref_fetch_status_key">fetch_key</string>
+    <string name="error_download">Error download</string>
 </resources>

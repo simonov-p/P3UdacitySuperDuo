@@ -1,6 +1,7 @@
 package barqsoft.footballscores;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,18 +13,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import barqsoft.footballscores.service.MyFetchService;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainScreenFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
+public class MainScreenFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> ,
+        SharedPreferences.OnSharedPreferenceChangeListener
 {
     public ScoresAdapter mAdapter;
     public static final int SCORES_LOADER = 0;
     private String[] fragmentdate = new String[1];
     private int last_selected_item = -1;
+
+    private ListView mScoreList;
+    private TextView mEmptyView;
 
     public MainScreenFragment()
     {
@@ -43,16 +49,18 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
                              final Bundle savedInstanceState) {
         update_scores();
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        final ListView score_list = (ListView) rootView.findViewById(R.id.scores_list);
+        mScoreList = (ListView) rootView.findViewById(R.id.scores_list);
+        mEmptyView = (TextView)rootView.findViewById(R.id.empty_text_view);
+        mScoreList.setEmptyView(mEmptyView);
+        updateEmptyView(getString(R.string.error_download));
+
         mAdapter = new ScoresAdapter(getActivity(),null,0);
-        score_list.setAdapter(mAdapter);
+        mScoreList.setAdapter(mAdapter);
         getLoaderManager().initLoader(SCORES_LOADER,null,this);
         mAdapter.detail_match_id = MainActivity.selected_match_id;
-        score_list.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
+        mScoreList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ViewHolder selected = (ViewHolder) view.getTag();
                 mAdapter.detail_match_id = selected.match_id;
                 MainActivity.selected_match_id = (int) selected.match_id;
@@ -98,5 +106,16 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
     public void onLoaderReset(Loader<Cursor> cursorLoader)
     {
         mAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_fetch_status_key))) {
+            updateEmptyView(sharedPreferences.getString(key, getString(R.string.error_download)));
+        }
+    }
+
+    private void updateEmptyView(String text) {
+        mEmptyView.setText(text);
     }
 }
