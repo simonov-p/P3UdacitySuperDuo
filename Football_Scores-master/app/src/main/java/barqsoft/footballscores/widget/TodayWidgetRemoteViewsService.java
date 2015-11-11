@@ -1,19 +1,16 @@
 package barqsoft.footballscores.widget;
 
 import android.annotation.TargetApi;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.support.v4.app.TaskStackBuilder;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import barqsoft.footballscores.DatabaseContract;
-import barqsoft.footballscores.MainActivity;
 import barqsoft.footballscores.R;
 
 /**
@@ -22,10 +19,10 @@ import barqsoft.footballscores.R;
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class TodayWidgetRemoteViewsService extends RemoteViewsService {
     private static final String[] SCORES_COLUMNS = {
-            DatabaseContract.scores_table.HOME_COL,
-            DatabaseContract.scores_table.AWAY_COL,
-            DatabaseContract.scores_table.HOME_COL,
-            DatabaseContract.scores_table.AWAY_COL
+            DatabaseContract.ScoresTable.HOME_COL,
+            DatabaseContract.ScoresTable.AWAY_COL,
+            DatabaseContract.ScoresTable.HOME_COL,
+            DatabaseContract.ScoresTable.AWAY_COL
     };
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {

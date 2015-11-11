@@ -6,4 +6,6 @@
 
     <string name="title_widget_score">Последняя Игра</string>
     <string name="title_widget_today">Сегодняшние Игры</string>
+    <string name="share_button_cd">Поделиться</string>
+
 </resources>

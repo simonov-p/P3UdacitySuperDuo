@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.widget.RemoteViews;
 
@@ -24,10 +23,10 @@ import barqsoft.footballscores.R;
  */
 public class ScoreWidgetIntentService extends IntentService {
     private static final String[] SCORES_COLUMNS = {
-            DatabaseContract.scores_table.HOME_COL,
-            DatabaseContract.scores_table.AWAY_COL,
-            DatabaseContract.scores_table.HOME_COL,
-            DatabaseContract.scores_table.AWAY_COL
+            DatabaseContract.ScoresTable.HOME_COL,
+            DatabaseContract.ScoresTable.AWAY_COL,
+            DatabaseContract.ScoresTable.HOME_COL,
+            DatabaseContract.ScoresTable.AWAY_COL
     };
 
     // these indices must match the projection
