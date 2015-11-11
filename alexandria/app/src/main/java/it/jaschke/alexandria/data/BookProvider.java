@@ -28,6 +28,9 @@ public class BookProvider extends ContentProvider {
     private static final int BOOK_FULLDETAIL = 501;
 
     private static final UriMatcher uriMatcher = buildUriMatcher();
+    private final String UNKNOWN_URI = "Unknown uri: ";
+    private final String FAILED_TO_INSERT = "Failed to insert row into ";
+    private final String ID_FIELD = "_id";
 
     private DbHelper dbHelper;
 
@@ -171,7 +174,7 @@ public class BookProvider extends ContentProvider {
                         sortOrder);
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+                throw new UnsupportedOperationException(UNKNOWN_URI + uri);
         }
 
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
@@ -201,7 +204,7 @@ public class BookProvider extends ContentProvider {
             case CATEGORY:
                 return AlexandriaContract.CategoryEntry.CONTENT_TYPE;
             default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+                throw new UnsupportedOperationException(UNKNOWN_URI + uri);
         }
     }
 
@@ -216,7 +219,7 @@ public class BookProvider extends ContentProvider {
                 if ( _id > 0 ){
                     returnUri = AlexandriaContract.BookEntry.buildBookUri(_id);
                 } else {
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                    throw new android.database.SQLException(FAILED_TO_INSERT + uri);
                 }
                 getContext().getContentResolver().notifyChange(AlexandriaContract.BookEntry.buildFullBookUri(_id), null);
                 break;
@@ -224,21 +227,21 @@ public class BookProvider extends ContentProvider {
             case AUTHOR:{
                 long _id = db.insert(AlexandriaContract.AuthorEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
-                    returnUri = AlexandriaContract.AuthorEntry.buildAuthorUri(values.getAsLong("_id"));
+                    returnUri = AlexandriaContract.AuthorEntry.buildAuthorUri(values.getAsLong(ID_FIELD));
                 else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                    throw new android.database.SQLException(FAILED_TO_INSERT + uri);
                 break;
             }
             case CATEGORY: {
                 long _id = db.insert(AlexandriaContract.CategoryEntry.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = AlexandriaContract.CategoryEntry.buildCategoryUri(values.getAsLong("_id"));
+                    returnUri = AlexandriaContract.CategoryEntry.buildCategoryUri(values.getAsLong(ID_FIELD));
                 else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                    throw new android.database.SQLException(FAILED_TO_INSERT + uri);
                 break;
             }
             default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+                throw new UnsupportedOperationException(UNKNOWN_URI + uri);
         }
         return returnUri;
     }
@@ -268,7 +271,7 @@ public class BookProvider extends ContentProvider {
                         selectionArgs);
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+                throw new UnsupportedOperationException(UNKNOWN_URI + uri);
         }
         // Because a null deletes all rows
         if (selection == null || rowsDeleted != 0) {
@@ -297,7 +300,7 @@ public class BookProvider extends ContentProvider {
                 break;
 
             default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+                throw new UnsupportedOperationException(UNKNOWN_URI + uri);
         }
         if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);

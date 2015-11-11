@@ -21,6 +21,7 @@ import java.net.URL;
 
 import it.jaschke.alexandria.MainActivity;
 import it.jaschke.alexandria.R;
+import it.jaschke.alexandria.Utility;
 import it.jaschke.alexandria.data.AlexandriaContract;
 
 
@@ -91,6 +92,10 @@ public class BookService extends IntentService {
 
         bookEntry.close();
 
+        if (!Utility.isNetworkAvailable(getApplicationContext())) {
+            return;
+        }
+
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String bookJsonString = null;
@@ -106,6 +111,9 @@ public class BookService extends IntentService {
                     .build();
 
             URL url = new URL(builtUri.toString());
+
+            Log.e(LOG_TAG, "url " + url.toString());
+
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
@@ -163,7 +171,7 @@ public class BookService extends IntentService {
                 bookArray = bookJson.getJSONArray(ITEMS);
             }else{
                 Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
-                messageIntent.putExtra(MainActivity.MESSAGE_KEY,getResources().getString(R.string.not_found));
+                messageIntent.putExtra(MainActivity.MESSAGE_KEY, getResources().getString(R.string.not_found));
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
                 return;
             }
@@ -202,6 +210,8 @@ public class BookService extends IntentService {
     }
 
     private void writeBackBook(String ean, String title, String subtitle, String desc, String imgUrl) {
+//        Log.e("mytag:book", "ean="  + ean + ", title="  + title + ", imgUrl="  + imgUrl + ", subtitle="
+//                + subtitle + ", desc="  + desc);
         ContentValues values= new ContentValues();
         values.put(AlexandriaContract.BookEntry._ID, ean);
         values.put(AlexandriaContract.BookEntry.TITLE, title);

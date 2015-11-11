@@ -14,8 +14,11 @@ import android.view.SurfaceView;
 
 import java.io.IOException;
 
+import it.jaschke.alexandria.R;
+
 /** A basic Camera preview class */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+    private final String LOG_TAG = "DBG";
     private SurfaceHolder mHolder;
     private Camera mCamera;
     private Camera.PreviewCallback previewCallback;
@@ -58,7 +61,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         try {
             mCamera.setPreviewDisplay(holder);
         } catch (IOException e) {
-            Log.d("DBG", "Error setting camera preview: " + e.getMessage());
+            Log.d(LOG_TAG, getResources().getString(R.string.error_camera_preview)+ e.getMessage());
         }
     }
 
@@ -92,7 +95,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.startPreview();
             mCamera.autoFocus(autoFocusCallback);
         } catch (Exception e){
-            Log.d("DBG", "Error starting camera preview: " + e.getMessage());
+            Log.d(LOG_TAG, getResources().getString(R.string.error_camera_preview) + e.getMessage());
         }
     }
 }

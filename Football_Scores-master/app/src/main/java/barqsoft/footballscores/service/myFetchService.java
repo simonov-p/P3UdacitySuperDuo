@@ -4,7 +4,9 @@ import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -28,20 +30,25 @@ import barqsoft.footballscores.R;
 /**
  * Created by yehya khaled on 3/2/2015.
  */
-public class myFetchService extends IntentService
+public class MyFetchService extends IntentService
 {
-    public static final String LOG_TAG = "myFetchService";
-    public myFetchService()
+    public static final String LOG_TAG = MyFetchService.class.getSimpleName();
+
+    public MyFetchService()
     {
-        super("myFetchService");
+        super("MyFetchService");
     }
+    public static final String ACTION_DATA_UPDATED = "barqsoft.footballscores.app.ACTION_DATA_UPDATED";
+
+    private static final String SERVER_ERROR = "Server error";
+    private static final String SERVER_DOWN = "Server down";
+    private static final String SERVER_INVALID = "Server invalid";
 
     @Override
     protected void onHandleIntent(Intent intent)
     {
         getData("n2");
         getData("p2");
-
         return;
     }
 
@@ -63,11 +70,13 @@ public class myFetchService extends IntentService
             URL fetch = new URL(fetch_build.toString());
             m_connection = (HttpURLConnection) fetch.openConnection();
             m_connection.setRequestMethod("GET");
-            m_connection.addRequestProperty("X-Auth-Token",getString(R.string.api_key));
+            m_connection.addRequestProperty("X-Auth-Token", getString(R.string.api_key));
             m_connection.connect();
+            Log.v("mytag:URL", fetch.toString());
 
             // Read the input stream into a String
-            InputStream inputStream = m_connection.getInputStream();
+            InputStream inputStream = null;
+                    inputStream = m_connection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
                 // Nothing to do.
@@ -87,12 +96,32 @@ public class myFetchService extends IntentService
                 return;
             }
             JSON_data = buffer.toString();
+            if (JSON_data != null) {
+                //This bit is to check if the data contains any matches. If not, we call processJson on the dummy data
+                JSONArray matches = new JSONObject(JSON_data).getJSONArray("fixtures");
+                if (matches.length() == 0) {
+                    //if there is no data, call the function on dummy data
+                    //this is expected behavior during the off season.
+                    processJSONdata(getString(R.string.dummy_data), getApplicationContext(), false);
+                    return;
+                }
+                processJSONdata(JSON_data, getApplicationContext(), true);
+            } else {
+                //Could not Connect
+                Log.d(LOG_TAG, "Could not connect to server.");
+                setServerStatus(SERVER_DOWN);
+            }
         }
-        catch (Exception e)
-        {
-            Log.e(LOG_TAG,"Exception here" + e.getMessage());
-        }
-        finally {
+        catch (IOException e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG, "Exception here" + e.getMessage());
+            setServerStatus(SERVER_DOWN);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+            setServerStatus(SERVER_INVALID);
+
+        } finally {
             if(m_connection != null)
             {
                 m_connection.disconnect();
@@ -104,31 +133,10 @@ public class myFetchService extends IntentService
                 }
                 catch (IOException e)
                 {
+                    e.printStackTrace();
                     Log.e(LOG_TAG,"Error Closing Stream");
                 }
             }
-        }
-        try {
-            if (JSON_data != null) {
-                //This bit is to check if the data contains any matches. If not, we call processJson on the dummy data
-                JSONArray matches = new JSONObject(JSON_data).getJSONArray("fixtures");
-                if (matches.length() == 0) {
-                    //if there is no data, call the function on dummy data
-                    //this is expected behavior during the off season.
-                    processJSONdata(getString(R.string.dummy_data), getApplicationContext(), false);
-                    return;
-                }
-
-
-                processJSONdata(JSON_data, getApplicationContext(), true);
-            } else {
-                //Could not Connect
-                Log.d(LOG_TAG, "Could not connect to server.");
-            }
-        }
-        catch(Exception e)
-        {
-            Log.e(LOG_TAG,e.getMessage());
         }
     }
     private void processJSONdata (String JSONdata,Context mContext, boolean isReal)
@@ -163,6 +171,8 @@ public class myFetchService extends IntentService
         final String AWAY_GOALS = "goalsAwayTeam";
         final String MATCH_DAY = "matchday";
 
+        final String OWM_MESSAGE_CODE = "cod";
+
         //Match data
         String League = null;
         String mDate = null;
@@ -176,7 +186,24 @@ public class myFetchService extends IntentService
 
 
         try {
-            JSONArray matches = new JSONObject(JSONdata).getJSONArray(FIXTURES);
+            JSONObject jsonObject = new JSONObject(JSONdata);
+            JSONArray matches = jsonObject.getJSONArray(FIXTURES);
+
+            //do we have error?
+            if (jsonObject.has(OWM_MESSAGE_CODE)){
+                int errorCode = jsonObject.getInt(OWM_MESSAGE_CODE);
+
+                switch (errorCode){
+                    case HttpURLConnection.HTTP_OK:
+                        break;
+                    case HttpURLConnection.HTTP_NOT_FOUND:
+                        setServerStatus(SERVER_INVALID);
+                        return;
+                    default:
+                        setServerStatus(SERVER_DOWN);
+                        return;
+                }
+            }
 
 
             //ContentValues to be inserted
@@ -192,12 +219,12 @@ public class myFetchService extends IntentService
                 //add leagues here in order to have them be added to the DB.
                 // If you are finding no data in the app, check that this contains all the leagues.
                 // If it doesn't, that can cause an empty DB, bypassing the dummy data routine.
-                if(     League.equals(PREMIER_LEAGUE)      ||
-                        League.equals(SERIE_A)             ||
-                        League.equals(BUNDESLIGA1)         ||
-                        League.equals(BUNDESLIGA2)         ||
-                        League.equals(PRIMERA_DIVISION)     )
-                {
+//                if(     League.equals(PREMIER_LEAGUE)      ||
+//                        League.equals(SERIE_A)             ||
+//                        League.equals(BUNDESLIGA1)         ||
+//                        League.equals(BUNDESLIGA2)         ||
+//                        League.equals(PRIMERA_DIVISION)     )
+//                {
                     match_id = match_data.getJSONObject(LINKS).getJSONObject(SELF).
                             getString("href");
                     match_id = match_id.replace(MATCH_LINK, "");
@@ -237,15 +264,15 @@ public class myFetchService extends IntentService
                     Away_goals = match_data.getJSONObject(RESULT).getString(AWAY_GOALS);
                     match_day = match_data.getString(MATCH_DAY);
                     ContentValues match_values = new ContentValues();
-                    match_values.put(DatabaseContract.scores_table.MATCH_ID,match_id);
-                    match_values.put(DatabaseContract.scores_table.DATE_COL,mDate);
-                    match_values.put(DatabaseContract.scores_table.TIME_COL,mTime);
-                    match_values.put(DatabaseContract.scores_table.HOME_COL,Home);
-                    match_values.put(DatabaseContract.scores_table.AWAY_COL,Away);
-                    match_values.put(DatabaseContract.scores_table.HOME_GOALS_COL,Home_goals);
-                    match_values.put(DatabaseContract.scores_table.AWAY_GOALS_COL,Away_goals);
-                    match_values.put(DatabaseContract.scores_table.LEAGUE_COL,League);
-                    match_values.put(DatabaseContract.scores_table.MATCH_DAY,match_day);
+                    match_values.put(DatabaseContract.ScoresTable.MATCH_ID,match_id);
+                    match_values.put(DatabaseContract.ScoresTable.DATE_COL,mDate);
+                    match_values.put(DatabaseContract.ScoresTable.TIME_COL,mTime);
+                    match_values.put(DatabaseContract.ScoresTable.HOME_COL,Home);
+                    match_values.put(DatabaseContract.ScoresTable.AWAY_COL,Away);
+                    match_values.put(DatabaseContract.ScoresTable.HOME_GOALS_COL,Home_goals);
+                    match_values.put(DatabaseContract.ScoresTable.AWAY_GOALS_COL,Away_goals);
+                    match_values.put(DatabaseContract.ScoresTable.LEAGUE_COL,League);
+                    match_values.put(DatabaseContract.ScoresTable.MATCH_DAY,match_day);
                     //log spam
 
                     //Log.v(LOG_TAG,match_id);
@@ -258,7 +285,7 @@ public class myFetchService extends IntentService
 
                     values.add(match_values);
                 }
-            }
+//            }
             int inserted_data = 0;
             ContentValues[] insert_data = new ContentValues[values.size()];
             values.toArray(insert_data);
@@ -269,9 +296,19 @@ public class myFetchService extends IntentService
         }
         catch (JSONException e)
         {
+            e.printStackTrace();
             Log.e(LOG_TAG,e.getMessage());
-        }
+            setServerStatus(SERVER_INVALID);
 
+        }
+    }
+
+    private void setServerStatus(String fetchStatus){
+        Context c = getApplicationContext();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putString(c.getString(R.string.pref_fetch_status_key), fetchStatus);
+        spe.commit();
     }
 }
 
