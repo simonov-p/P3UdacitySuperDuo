@@ -3,4 +3,7 @@
     <string name="today">сегодня</string>
     <string name="yesterday">вчера</string>
     <string name="tomorrow">завтра</string>
+
+    <string name="title_widget_score">Последняя Игра</string>
+    <string name="title_widget_today">Сегодняшние Игры</string>
 </resources>

@@ -67,6 +67,7 @@ public class ScoreWidgetIntentService extends IntentService {
         }
         if (!data.moveToFirst()) {
             data.close();
+
             return;
         }
 

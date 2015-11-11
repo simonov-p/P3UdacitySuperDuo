@@ -28,12 +28,12 @@ import barqsoft.footballscores.R;
 /**
  * Created by yehya khaled on 3/2/2015.
  */
-public class myFetchService extends IntentService
+public class MyFetchService extends IntentService
 {
-    public static final String LOG_TAG = "myFetchService";
-    public myFetchService()
+    public static final String LOG_TAG = MyFetchService.class.getSimpleName();
+    public MyFetchService()
     {
-        super("myFetchService");
+        super("MyFetchService");
     }
     public static final String ACTION_DATA_UPDATED = "barqsoft.footballscores.app.ACTION_DATA_UPDATED";
 
@@ -63,8 +63,9 @@ public class myFetchService extends IntentService
             URL fetch = new URL(fetch_build.toString());
             m_connection = (HttpURLConnection) fetch.openConnection();
             m_connection.setRequestMethod("GET");
-            m_connection.addRequestProperty("X-Auth-Token",getString(R.string.api_key));
+            m_connection.addRequestProperty("X-Auth-Token", getString(R.string.api_key));
             m_connection.connect();
+            Log.v("mytag:URL", fetch.toString());
 
             // Read the input stream into a String
             InputStream inputStream = null;
@@ -88,6 +89,7 @@ public class myFetchService extends IntentService
                 return;
             }
             JSON_data = buffer.toString();
+            Log.v("mytag:JSON_data", JSON_data);
             if (JSON_data != null) {
                 //This bit is to check if the data contains any matches. If not, we call processJson on the dummy data
                 JSONArray matches = new JSONObject(JSON_data).getJSONArray("fixtures");
@@ -190,12 +192,12 @@ public class myFetchService extends IntentService
                 //add leagues here in order to have them be added to the DB.
                 // If you are finding no data in the app, check that this contains all the leagues.
                 // If it doesn't, that can cause an empty DB, bypassing the dummy data routine.
-                if(     League.equals(PREMIER_LEAGUE)      ||
-                        League.equals(SERIE_A)             ||
-                        League.equals(BUNDESLIGA1)         ||
-                        League.equals(BUNDESLIGA2)         ||
-                        League.equals(PRIMERA_DIVISION)     )
-                {
+//                if(     League.equals(PREMIER_LEAGUE)      ||
+//                        League.equals(SERIE_A)             ||
+//                        League.equals(BUNDESLIGA1)         ||
+//                        League.equals(BUNDESLIGA2)         ||
+//                        League.equals(PRIMERA_DIVISION)     )
+//                {
                     match_id = match_data.getJSONObject(LINKS).getJSONObject(SELF).
                             getString("href");
                     match_id = match_id.replace(MATCH_LINK, "");
@@ -256,7 +258,7 @@ public class myFetchService extends IntentService
 
                     values.add(match_values);
                 }
-            }
+//            }
             int inserted_data = 0;
             ContentValues[] insert_data = new ContentValues[values.size()];
             values.toArray(insert_data);
@@ -270,7 +272,6 @@ public class myFetchService extends IntentService
             e.printStackTrace();
             Log.e(LOG_TAG,e.getMessage());
         }
-
     }
 }
 
