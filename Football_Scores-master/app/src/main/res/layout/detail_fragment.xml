@@ -16,6 +16,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="@string/test_text"
+            android:contentDescription="@string/league_name_cd"
             android:textColor="@android:color/black"
             android:textSize="@dimen/League" />
 
@@ -24,6 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:contentDescription="@string/matchday_cd"
             android:gravity="center"
             android:text="@string/test_text"
             android:textColor="@android:color/black"
@@ -37,6 +39,7 @@
 
         <Button
             android:id="@+id/share_button"
+            android:contentDescription="@string/share_button_cd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

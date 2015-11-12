@@ -49,4 +49,6 @@
     <string name="no_games">No games</string>
     <string name="pref_fetch_status_key">fetch_key</string>
     <string name="error_download">Error download</string>
+    <string name="league_name_cd">League name</string>
+    <string name="matchday_cd">Match day</string>
 </resources>
