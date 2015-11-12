@@ -81,7 +81,7 @@ public class ScoresAdapter extends CursorAdapter
             match_day.setText(Utilies.getMatchDay(cursor.getInt(COL_MATCHDAY),
                     cursor.getInt(COL_LEAGUE)));
             TextView league = (TextView) v.findViewById(R.id.league_textview);
-            league.setText(Utilies.getLeague(cursor.getInt(COL_LEAGUE)));
+            league.setText(Utilies.getLeague(cursor.getInt(COL_LEAGUE),context));
             Button share_button = (Button) v.findViewById(R.id.share_button);
             share_button.setContentDescription(context.getString(R.string.share_button_cd));
             share_button.setOnClickListener(new View.OnClickListener() {
